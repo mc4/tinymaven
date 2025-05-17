@@ -1,0 +1,17 @@
+project:
+  name: tinymaven
+  version: 0.0.1
+  mainClass: dev.markconley.tinymaven.TinyMaven
+
+dependencies:
+  - group: org.yaml
+    artifact: snakeyaml
+    version: 2.2
+  - group: commons-io
+    artifact: commons-io
+    version: 2.19.0
+
+tasks:
+  - compile
+  - test
+  - package
