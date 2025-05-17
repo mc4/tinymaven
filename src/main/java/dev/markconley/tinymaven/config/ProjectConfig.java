@@ -1,25 +1,37 @@
-package dev.markconley.tinymaven;
+package dev.markconley.tinymaven.config;
 
 import java.util.List;
 
 public class ProjectConfig {
 	private Project project;
 	private List<Dependency> dependencies;
+	private List<String> tasks;
+
+	public ProjectConfig() {
+	}
 
 	public Project getProject() {
 		return project;
-	}
-
-	public void setProject(Project project) {
-		this.project = project;
 	}
 
 	public List<Dependency> getDependencies() {
 		return dependencies;
 	}
 
+	public List<String> getTasks() {
+		return tasks;
+	}
+
+	public void setProject(Project project) {
+		this.project = project;
+	}
+
 	public void setDependencies(List<Dependency> dependencies) {
 		this.dependencies = dependencies;
+	}
+
+	public void setTasks(List<String> tasks) {
+		this.tasks = tasks;
 	}
 
 	public static class Project {
@@ -31,25 +43,26 @@ public class ProjectConfig {
 			return name;
 		}
 
-		public void setName(String name) {
-			this.name = name;
-		}
-
 		public String getVersion() {
 			return version;
-		}
-
-		public void setVersion(String version) {
-			this.version = version;
 		}
 
 		public String getMainClass() {
 			return mainClass;
 		}
 
+		public void setName(String name) {
+			this.name = name;
+		}
+
+		public void setVersion(String version) {
+			this.version = version;
+		}
+
 		public void setMainClass(String mainClass) {
 			this.mainClass = mainClass;
 		}
+
 	}
 
 	public static class Dependency {
@@ -61,24 +74,25 @@ public class ProjectConfig {
 			return group;
 		}
 
-		public void setGroup(String group) {
-			this.group = group;
-		}
-
 		public String getArtifact() {
 			return artifact;
-		}
-
-		public void setArtifact(String artifact) {
-			this.artifact = artifact;
 		}
 
 		public String getVersion() {
 			return version;
 		}
 
+		public void setGroup(String group) {
+			this.group = group;
+		}
+
+		public void setArtifact(String artifact) {
+			this.artifact = artifact;
+		}
+
 		public void setVersion(String version) {
 			this.version = version;
 		}
+
 	}
 }

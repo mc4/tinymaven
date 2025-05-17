@@ -13,7 +13,6 @@
 		<maven.compiler.target>24</maven.compiler.target>
 	</properties>
 	<dependencies>
-		<!-- JUnit 5 -->
 		<dependency>
 			<groupId>org.junit.jupiter</groupId>
 			<artifactId>junit-jupiter-api</artifactId>
@@ -25,29 +24,23 @@
 			<artifactId>junit-jupiter-engine</artifactId>
 			<version>5.8.1</version>
 		</dependency>
-
 		<!-- https://mvnrepository.com/artifact/org.yaml/snakeyaml -->
 		<dependency>
 			<groupId>org.yaml</groupId>
 			<artifactId>snakeyaml</artifactId>
 			<version>2.2</version>
 		</dependency>
-
 		<!-- https://mvnrepository.com/artifact/org.snakeyaml/snakeyaml-engine -->
 		<dependency>
 			<groupId>org.snakeyaml</groupId>
 			<artifactId>snakeyaml-engine</artifactId>
 			<version>2.9</version>
 		</dependency>
-
 		<!-- https://mvnrepository.com/artifact/commons-io/commons-io -->
 		<dependency>
 			<groupId>commons-io</groupId>
 			<artifactId>commons-io</artifactId>
 			<version>2.19.0</version>
 		</dependency>
-
 	</dependencies>
-
-
 </project>
