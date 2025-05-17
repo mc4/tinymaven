@@ -6,6 +6,8 @@ public class ProjectConfig {
 	private Project project;
 	private List<Dependency> dependencies;
 	private List<String> tasks;
+	private String sourceDirectory;
+	private String outputDirectory;
 
 	public ProjectConfig() {
 	}
@@ -22,6 +24,16 @@ public class ProjectConfig {
 		return tasks;
 	}
 
+	// Default to "src/main/java" if not specified
+	public String getSourceDirectory() {
+		return sourceDirectory != null ? sourceDirectory : "src/main/java";
+	}
+
+	// Default to "build/classes" if not specified
+	public String getOutputDirectory() {
+		return outputDirectory != null ? outputDirectory : "build/classes";
+	}
+
 	public void setProject(Project project) {
 		this.project = project;
 	}
@@ -32,6 +44,14 @@ public class ProjectConfig {
 
 	public void setTasks(List<String> tasks) {
 		this.tasks = tasks;
+	}
+
+	public void setSourceDirectory(String sourceDirectory) {
+		this.sourceDirectory = sourceDirectory;
+	}
+
+	public void setOutputDirectory(String outputDirectory) {
+		this.outputDirectory = outputDirectory;
 	}
 
 	public static class Project {
@@ -62,7 +82,6 @@ public class ProjectConfig {
 		public void setMainClass(String mainClass) {
 			this.mainClass = mainClass;
 		}
-
 	}
 
 	public static class Dependency {
@@ -93,6 +112,5 @@ public class ProjectConfig {
 		public void setVersion(String version) {
 			this.version = version;
 		}
-
 	}
 }
