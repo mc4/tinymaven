@@ -30,7 +30,7 @@ public class CompileTask implements Task {
 	private void compileSources(ProjectConfig config) {
 		System.out.println("Compiling sources...");
 		
-		ensureOutputDirectoryExists();
+		ensureOutputDirectoryExists(config.getOutputDirectory());
 
 		List<String> options = List.of("-d", config.getOutputDirectory());
 		Path pathToScan = Paths.get(config.getSourceDirectory());
@@ -45,8 +45,8 @@ public class CompileTask implements Task {
 		runCompilation(sourceFilesToCompile, options);
 	}
 
-	private void ensureOutputDirectoryExists() {
-		Path path = Paths.get("build/classes/");
+	private void ensureOutputDirectoryExists(String outputDirectory) {
+		Path path = Paths.get(outputDirectory);
 		if (!Files.exists(path)) {
 			try {
 				Files.createDirectories(path);
