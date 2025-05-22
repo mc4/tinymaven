@@ -15,10 +15,10 @@ import javax.tools.StandardJavaFileManager;
 
 import dev.markconley.tinymaven.config.ProjectConfig;
 
-public class CompileTask implements Task {
+public class SourceCompileTask implements Task {
 	private JavaCompiler compiler;
 	
-	public CompileTask(JavaCompiler compiler) {
+	public SourceCompileTask(JavaCompiler compiler) {
 		this.compiler = Objects.requireNonNull(compiler);
 	}
 
