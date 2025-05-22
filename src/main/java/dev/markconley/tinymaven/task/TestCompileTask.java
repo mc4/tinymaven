@@ -15,34 +15,42 @@ import javax.tools.StandardJavaFileManager;
 
 import dev.markconley.tinymaven.config.ProjectConfig;
 
-public class SourceCompileTask implements Task {
+public class TestCompileTask implements Task {
+
 	private JavaCompiler compiler;
-	
-	public SourceCompileTask(JavaCompiler compiler) {
+
+	public TestCompileTask(JavaCompiler compiler) {
 		this.compiler = Objects.requireNonNull(compiler, "JavaCompiler must not be null");
 	}
 
 	@Override
 	public void execute(ProjectConfig config) {
-		compileSources(config);
+		compileTestSources(config);
 	}
-	
-	private void compileSources(ProjectConfig config) {
+
+	private void compileTestSources(ProjectConfig config) {
 		System.out.println("Compiling sources...");
-		
-		ensureOutputDirectoryExists(config.getOutputDirectory());
 
-		List<String> options = List.of("-d", config.getOutputDirectory());
-		Path pathToScan = Paths.get(config.getSourceDirectory());
-		
-		List<File> sourceFilesToCompile = collectJavaSourceFiles(pathToScan);
+		ensureOutputDirectoryExists(config.getTestOutputDirectory());
 
-		if (sourceFilesToCompile.isEmpty()) {
+		List<String> options = List.of("-d", config.getTestOutputDirectory());
+		Path pathToScan = Paths.get(config.getTestSourceDirectory());
+
+		List<File> testFilesToCompile = collectTestSourceFiles(pathToScan);
+
+		if (testFilesToCompile.isEmpty()) {
 			System.out.println("No .java files found to compile.");
 			return;
 		}
 
-		runCompilation(sourceFilesToCompile, options);
+		runCompilation(testFilesToCompile, options);
+
+		boolean success = runCompilation(testFilesToCompile, options);
+		if (!success) {
+			System.err.println("Test compilation failed.");
+			return;
+		}
+
 	}
 
 	private void ensureOutputDirectoryExists(String outputDirectory) {
@@ -56,25 +64,24 @@ public class SourceCompileTask implements Task {
 		}
 	}
 
-	private List<File> collectJavaSourceFiles(Path pathToScan) {
+	private List<File> collectTestSourceFiles(Path pathToScan) {
 		try (Stream<Path> streamOfFiles = Files.walk(pathToScan)) {
 			return streamOfFiles
-					.filter(path -> Files.isRegularFile(path) && path.toString().endsWith(".java"))
-					.map(Path::toFile)
-					.toList();
+					.filter(path -> Files.isRegularFile(path) && path.toString()
+					.endsWith(".java"))
+					.map(Path::toFile).toList();
 		} catch (IOException e) {
-			System.out.println(
-					"something bad happened when reading or processing the files to scan in " + "'" + pathToScan + "'");
+			System.out.println("something bad happened when reading or processing the files to scan in " + "'" + pathToScan + "'");
 			e.printStackTrace();
 		}
 		return List.of();
 	}
 
-
 	private boolean runCompilation(List<File> sources, List<String> options) {
 		try (StandardJavaFileManager fileManager = compiler.getStandardFileManager(null, null, null)) {
 			Iterable<? extends JavaFileObject> compilationUnits = fileManager.getJavaFileObjectsFromFiles(sources);
-			JavaCompiler.CompilationTask task = compiler.getTask(null, fileManager, null, options, null,compilationUnits);
+			JavaCompiler.CompilationTask task = compiler.getTask(null, fileManager, null, options, null,
+					compilationUnits);
 			boolean success = task.call();
 			return success;
 		} catch (IOException e) {

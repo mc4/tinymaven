@@ -11,7 +11,7 @@ import dev.markconley.tinymaven.task.PackageJarTask;
 import dev.markconley.tinymaven.task.PackageWarTask;
 import dev.markconley.tinymaven.task.SourceCompileTask;
 import dev.markconley.tinymaven.task.Task;
-import dev.markconley.tinymaven.task.TestTask;
+import dev.markconley.tinymaven.task.TestCompileTask;
 
 public class TinyMaven {
 
@@ -39,7 +39,7 @@ public class TinyMaven {
     private static Map<String, Task> createTaskMap(JavaCompiler compiler) {
         Map<String, Task> taskMap = new HashMap<>();
         taskMap.put("build", new SourceCompileTask(compiler));
-        taskMap.put("test", new TestTask(compiler));
+        taskMap.put("test", new TestCompileTask(compiler));
         taskMap.put("packagejar", new PackageJarTask());
         taskMap.put("packagewar", new PackageWarTask());
         return taskMap;
