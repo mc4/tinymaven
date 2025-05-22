@@ -18,3 +18,5 @@ tasks:
 
 sourceDirectory: src/main/java
 outputDirectory: build/classes
+testSourceDirectory: src/test/java
+testOutputDirectory: build/test-classes

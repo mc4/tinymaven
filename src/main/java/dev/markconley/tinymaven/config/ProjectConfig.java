@@ -6,8 +6,11 @@ public class ProjectConfig {
 	private Project project;
 	private List<Dependency> dependencies;
 	private List<String> tasks;
+	
 	private String sourceDirectory;
 	private String outputDirectory;
+	private String testSourceDirectory;
+	private String testOutputDirectory;
 
 	public ProjectConfig() {
 	}
@@ -33,6 +36,14 @@ public class ProjectConfig {
 	public String getOutputDirectory() {
 		return outputDirectory != null ? outputDirectory : "build/classes";
 	}
+	
+	public String getTestSourceDirectory() {
+	    return testSourceDirectory != null ? testSourceDirectory : "src/test/java";
+	}
+
+	public String getTestOutputDirectory() {
+	    return testOutputDirectory != null ? testOutputDirectory : "build/test-classes";
+	}
 
 	public void setProject(Project project) {
 		this.project = project;
@@ -52,6 +63,14 @@ public class ProjectConfig {
 
 	public void setOutputDirectory(String outputDirectory) {
 		this.outputDirectory = outputDirectory;
+	}
+	
+	public void setTestSourceDirectory(String testSourceDirectory) {
+	    this.testSourceDirectory = testSourceDirectory;
+	}
+
+	public void setTestOutputDirectory(String testOutputDirectory) {
+	    this.testOutputDirectory = testOutputDirectory;
 	}
 
 	public static class Project {
