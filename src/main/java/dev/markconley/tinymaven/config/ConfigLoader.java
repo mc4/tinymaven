@@ -1,4 +1,4 @@
-package dev.markconley.tinymaven;
+package dev.markconley.tinymaven.config;
 
 import java.io.FileInputStream;
 import java.io.InputStream;
@@ -6,8 +6,6 @@ import java.io.InputStream;
 import org.yaml.snakeyaml.LoaderOptions;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.Constructor;
-
-import dev.markconley.tinymaven.config.ProjectConfig;
 
 public class ConfigLoader {
 	public static ProjectConfig loadConfig(String path) {

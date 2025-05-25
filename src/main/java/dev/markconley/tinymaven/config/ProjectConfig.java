@@ -1,11 +1,12 @@
 package dev.markconley.tinymaven.config;
 
 import java.util.List;
+import java.util.Map;
 
 public class ProjectConfig {
 	private Project project;
 	private List<Dependency> dependencies;
-	private List<String> tasks;
+	private Map<String, List<String>> lifecycle;
 	
 	private String sourceDirectory;
 	private String outputDirectory;
@@ -21,10 +22,6 @@ public class ProjectConfig {
 
 	public List<Dependency> getDependencies() {
 		return dependencies;
-	}
-
-	public List<String> getTasks() {
-		return tasks;
 	}
 
 	// Default to "src/main/java" if not specified
@@ -44,6 +41,10 @@ public class ProjectConfig {
 	public String getTestOutputDirectory() {
 	    return testOutputDirectory != null ? testOutputDirectory : "build/test-classes";
 	}
+	
+	public Map<String, List<String>> getLifecycle() {
+		return lifecycle;
+	}
 
 	public void setProject(Project project) {
 		this.project = project;
@@ -51,10 +52,6 @@ public class ProjectConfig {
 
 	public void setDependencies(List<Dependency> dependencies) {
 		this.dependencies = dependencies;
-	}
-
-	public void setTasks(List<String> tasks) {
-		this.tasks = tasks;
 	}
 
 	public void setSourceDirectory(String sourceDirectory) {
@@ -72,11 +69,17 @@ public class ProjectConfig {
 	public void setTestOutputDirectory(String testOutputDirectory) {
 	    this.testOutputDirectory = testOutputDirectory;
 	}
+	
+	public void setLifecycle(Map<String, List<String>> lifecycle) {
+		this.lifecycle = lifecycle;
+	}
+
 
 	public static class Project {
 		private String name;
 		private String version;
 		private String mainClass;
+		private String packaging;
 
 		public String getName() {
 			return name;
@@ -88,6 +91,10 @@ public class ProjectConfig {
 
 		public String getMainClass() {
 			return mainClass;
+		}
+		
+		public String getPackaging() {
+			return packaging != null ? packaging : "jar"; // default to jar
 		}
 
 		public void setName(String name) {

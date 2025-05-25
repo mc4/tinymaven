@@ -2,7 +2,8 @@ project:
   name: tinymaven
   version: 0.0.1
   mainClass: dev.markconley.tinymaven.TinyMaven
-
+  packaging: jar # or "war"
+  
 dependencies:
   - group: org.yaml
     artifact: snakeyaml
@@ -11,12 +12,18 @@ dependencies:
     artifact: commons-io
     version: 2.19.0
 
-tasks:
-  - compile
-  - test
-  - package
+lifecycle:
+  build:
+    #- clean
+    - compile
+    - test
+    - package
+  verify:
+    - compile
+    - test
 
 sourceDirectory: src/main/java
 outputDirectory: build/classes
 testSourceDirectory: src/test/java
 testOutputDirectory: build/test-classes
+
