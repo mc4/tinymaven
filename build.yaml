@@ -14,8 +14,9 @@ dependencies:
 
 lifecycle:
   build:
-    #- clean
+    - clean
     - compile
+    - testCompile
     - test
     - package
   verify:

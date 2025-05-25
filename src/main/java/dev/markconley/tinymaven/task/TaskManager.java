@@ -1,37 +1,43 @@
 package dev.markconley.tinymaven.task;
 
-import java.util.LinkedHashMap;
-import java.util.List;
+import java.util.HashMap;
 import java.util.Map;
 
+import dev.markconley.tinymaven.config.LifeCycleConfig;
 import dev.markconley.tinymaven.config.ProjectConfig;
 
 public class TaskManager {
 
-	private final Map<String, Task> taskRegistry = new LinkedHashMap<>();
+    private final Map<String, Task> tasks = new HashMap<>();
 
-	public TaskManager registerTask(String name, Task task) {
-		taskRegistry.put(name, task);
-		return this;
-	}
+    public void registerTask(String name, Task task) {
+        tasks.put(name.toLowerCase(), task);
+    }
 
-	public void runTasks(List<String> taskNames, ProjectConfig config) {
-		for (String taskName : taskNames) {
-			Task task = taskRegistry.get(taskName);
-			if (task == null) {
-				System.err.println("Unknown task: " + taskName);
-				continue;
-			}
-			System.out.println("Starting task: " + taskName);
-			try {
-				task.execute(config);
-				System.out.println("Completed task: " + taskName);
-			} catch (Exception e) {
-				System.err.println("Task '" + taskName + "' failed: " + e.getMessage());
-				e.printStackTrace();
-				break;
-			}
-		}
-	}
-	
+    public Task getTask(String name) {
+        return tasks.get(name.toLowerCase());
+    }
+
+    public void executeTask(String name, ProjectConfig config) {
+        Task task = getTask(name);
+        if (task == null) {
+            System.err.println("Unknown task: " + name);
+            return;
+        }
+        task.execute(config);
+    }
+
+    public void executeLifecycle(String lifeCycleName, ProjectConfig config) {
+        for (String step : LifeCycleConfig.getLifeCycleSteps(config.getProject().getPackaging(), lifeCycleName)) {
+            try {
+                System.out.println("Executing task: " + step);
+                executeTask(step, config);
+            } catch (Exception e) {
+                System.err.println("Task '" + step + "' failed. Aborting program.");
+                break; 
+            }
+        }
+    }
+
 }
+

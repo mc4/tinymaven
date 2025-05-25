@@ -1,65 +1,46 @@
 package dev.markconley.tinymaven;
 
-import java.util.Map;
-
-import javax.tools.JavaCompiler;
-import javax.tools.ToolProvider;
-
 import dev.markconley.tinymaven.config.ConfigLoader;
 import dev.markconley.tinymaven.config.ProjectConfig;
-import dev.markconley.tinymaven.task.PackageJarTask;
-import dev.markconley.tinymaven.task.PackageWarTask;
-import dev.markconley.tinymaven.task.SourceCompileTask;
 import dev.markconley.tinymaven.task.Task;
-import dev.markconley.tinymaven.task.TestCompileTask;
+import dev.markconley.tinymaven.task.TaskInitializer;
+import dev.markconley.tinymaven.task.TaskManager;
 
 public class TinyMaven {
 
-	public static void main(String[] args) {
-		if (args.length == 0) {
-			printUsage();
-			return;
-		}
+    public static void main(String[] args) {
+        if (args.length == 0) {
+            printUsage();
+            return;
+        }
 
-		String command = args[0];
-		ProjectConfig projectConfig = ConfigLoader.loadConfig("build.yaml");
-		JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
+        String command = args[0];
+        ProjectConfig projectConfig = ConfigLoader.loadConfig("build.yaml");
 
-		Task packagingTask = resolvePackagingTask(projectConfig);
+        TaskManager taskManager = new TaskManager();
+        TaskInitializer.initialize(taskManager);
 
-		Map<String, Task> taskMap = Map.of(
-				"build", new SourceCompileTask(compiler), 
-				"test", new TestCompileTask(compiler), 
-				"package", packagingTask);
+        Task selectedTask = taskManager.getTask(command);
+        if (selectedTask != null) {
+            selectedTask.execute(projectConfig);
+        } else {
+            System.out.println("Unknown command: " + command);
+            printUsage();
+        }
+    }
 
-		Task selectedTask = taskMap.get(command);
-		if (selectedTask != null) {
-			selectedTask.execute(projectConfig);
-		} else {
-			System.out.println("Unknown command: " + command);
-			printUsage();
-		}
-	}
-
-	private static Task resolvePackagingTask(ProjectConfig config) {
-		String packaging = config.getProject().getPackaging().toLowerCase();
-		return switch (packaging) {
-			case "war" -> new PackageWarTask();
-			case "jar" -> new PackageJarTask();
-			default -> {
-				System.out.println("Unsupported packaging type: " + packaging + ". Defaulting to jar.");
-				yield new PackageJarTask();
-			}
-		};
-	}
-
-	private static void printUsage() {
-		System.out.println("""
-				TinyMaven - Minimal Java Build Tool
-				Usage:
-				  java -jar tinymaven.jar build      Compile source files
-				  java -jar tinymaven.jar test       Run tests
-				  java -jar tinymaven.jar package    Create JAR or WAR based on build.yaml
-				""");
-	}
+    private static void printUsage() {
+        System.out.println("""
+            TinyMaven - Minimal Java Build Tool
+            Usage:
+              java -jar tinymaven.jar build         Compile source files and run lifecycle
+              java -jar tinymaven.jar clean         Clean build directories
+              java -jar tinymaven.jar compile       Compile source code
+              java -jar tinymaven.jar testcompile   Compile test code
+              java -jar tinymaven.jar test          Run tests
+              java -jar tinymaven.jar packagejar    Package as JAR
+              java -jar tinymaven.jar packagewar    Package as WAR
+            """);
+    }
 }
+
