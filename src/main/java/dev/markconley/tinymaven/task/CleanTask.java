@@ -1,15 +1,26 @@
 package dev.markconley.tinymaven.task;
 
-import dev.markconley.tinymaven.config.ProjectConfig;
-
 import java.io.IOException;
-import java.nio.file.*;
+import java.nio.file.FileVisitResult;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 
+import dev.markconley.tinymaven.config.ProjectConfig;
+import dev.markconley.tinymaven.exception.TinyMavenException;
+
 public class CleanTask implements Task {
+	
+    private final ProjectConfig config;
+
+    public CleanTask(ProjectConfig config) {
+        this.config = config;
+    }
 
 	@Override
-	public void execute(ProjectConfig config) {
+	public void execute() throws TinyMavenException {
 		cleanDirectory(config.getOutputDirectory());
 		cleanDirectory(config.getTestOutputDirectory());
 	}

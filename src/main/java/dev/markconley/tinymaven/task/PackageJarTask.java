@@ -13,17 +13,23 @@ import java.util.stream.Collectors;
 
 import dev.markconley.tinymaven.config.ManifestAttributes;
 import dev.markconley.tinymaven.config.ProjectConfig;
+import dev.markconley.tinymaven.exception.TinyMavenException;
 
 public class PackageJarTask implements Task {
 
+    private final ProjectConfig config;
+
+    public PackageJarTask(ProjectConfig config) {
+        this.config = config;
+    }
+	
 	@Override
-	public void execute(ProjectConfig config) {
-		packageJar(config);
+	public void execute() throws TinyMavenException {
+		packageJar();
 	}
 
-	private void packageJar(ProjectConfig config) {
+	private void packageJar() {
 	    System.out.println("Packaging JAR...");
-
 	    try {
 	        Path buildRoot = Paths.get(config.getOutputDirectory()).toAbsolutePath().normalize();
 	        Path jarOutputDir = Paths.get("build/libs").toAbsolutePath().normalize();
@@ -41,7 +47,7 @@ public class PackageJarTask implements Task {
 	    } catch (IOException e) {
 	        System.err.println("Failed to create JAR file: " + e.getMessage());
 	        e.printStackTrace();
-	    }
+	    }   
 	}
 
 	private Manifest createManifest(String mainClass) {

@@ -6,24 +6,53 @@ import java.util.Map;
 
 public final class LifeCycleConfig {
 
-	private static final Map<String, List<String>> JAR_BUILD_LIFECYCLE = Map.of(
-			"build", List.of("clean", "sourceCompile", "testCompile", "testRun", "packageJar"), 
-			"test", List.of("testCompile", "testRun"), "packagejar", List.of("packageJar"), 
-			"compile", List.of("sourceCompile"));
+    private LifeCycleConfig() {}
 
-	private static final Map<String, List<String>> WAR_BUILD_LIFECYCLE = Map.of(
-			"build", List.of("clean", "sourceCompile", "testCompile", "testRun", "packageWar"), 
-			"test", List.of("testCompile", "testRun"), "packagewar", List.of("packageWar"),
-			"compile", List.of("sourceCompile"));
+    private static final Map<BuildLifeCycle, List<BuildStep>> JAR_BUILD_LIFECYCLE = Map.of(
+        BuildLifeCycle.BUILD, List.of(
+            BuildStep.CLEAN,
+            BuildStep.SOURCE_COMPILE,
+            BuildStep.TEST_COMPILE,
+            BuildStep.TEST_RUN,
+            BuildStep.PACKAGE_JAR
+        ),
+        BuildLifeCycle.TEST, List.of(
+            BuildStep.TEST_COMPILE,
+            BuildStep.TEST_RUN
+        ),
+        BuildLifeCycle.PACKAGE_JAR, List.of(
+            BuildStep.PACKAGE_JAR
+        ),
+        BuildLifeCycle.COMPILE, List.of(
+            BuildStep.SOURCE_COMPILE
+        )
+    );
 
-	private LifeCycleConfig() { }
+    private static final Map<BuildLifeCycle, List<BuildStep>> WAR_BUILD_LIFECYCLE = Map.of(
+        BuildLifeCycle.BUILD, List.of(
+            BuildStep.CLEAN,
+            BuildStep.SOURCE_COMPILE,
+            BuildStep.TEST_COMPILE,
+            BuildStep.TEST_RUN,
+            BuildStep.PACKAGE_WAR
+        ),
+        BuildLifeCycle.TEST, List.of(
+            BuildStep.TEST_COMPILE,
+            BuildStep.TEST_RUN
+        ),
+        BuildLifeCycle.PACKAGE_WAR, List.of(
+            BuildStep.PACKAGE_WAR
+        ),
+        BuildLifeCycle.COMPILE, List.of(
+            BuildStep.SOURCE_COMPILE
+        )
+    );
 
-	public static List<String> getLifeCycleSteps(String packaging, String lifeCycleName) {
-		if ("war".equalsIgnoreCase(packaging)) {
-			return WAR_BUILD_LIFECYCLE.getOrDefault(lifeCycleName.toLowerCase(), Collections.emptyList());
-		}
-		
-		// Default to JAR 
-		return JAR_BUILD_LIFECYCLE.getOrDefault(lifeCycleName.toLowerCase(), Collections.emptyList());
-	}
+    public static List<BuildStep> getLifeCycleSteps(String packaging, BuildLifeCycle lifeCycle) {
+        if ("war".equalsIgnoreCase(packaging)) {
+            return WAR_BUILD_LIFECYCLE.getOrDefault(lifeCycle, Collections.emptyList());
+        }
+        // Default to JAR
+        return JAR_BUILD_LIFECYCLE.getOrDefault(lifeCycle, Collections.emptyList());
+    }
 }

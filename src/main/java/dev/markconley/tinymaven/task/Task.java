@@ -1,7 +1,7 @@
 package dev.markconley.tinymaven.task;
 
-import dev.markconley.tinymaven.config.ProjectConfig;
+import dev.markconley.tinymaven.exception.TinyMavenException;
 
 public interface Task {
-	void execute(ProjectConfig config);
+	void execute() throws TinyMavenException;
 }

@@ -14,20 +14,24 @@ import javax.tools.JavaFileObject;
 import javax.tools.StandardJavaFileManager;
 
 import dev.markconley.tinymaven.config.ProjectConfig;
+import dev.markconley.tinymaven.exception.TinyMavenException;
 
 public class SourceCompileTask implements Task {
-	private JavaCompiler compiler;
 	
-	public SourceCompileTask(JavaCompiler compiler) {
+	private JavaCompiler compiler;
+    private final ProjectConfig config;
+	
+	public SourceCompileTask(ProjectConfig config, JavaCompiler compiler) {
 		this.compiler = Objects.requireNonNull(compiler, "JavaCompiler must not be null");
+		this.config = Objects.requireNonNull(config, "Project Configuration cannot be null");
 	}
 
 	@Override
-	public void execute(ProjectConfig config) {
-		compileSources(config);
+	public void execute() throws TinyMavenException {
+		compileSources();
 	}
 	
-	private void compileSources(ProjectConfig config) {
+	private void compileSources() {
 		System.out.println("Compiling sources...");
 		
 		ensureOutputDirectoryExists(config.getOutputDirectory());

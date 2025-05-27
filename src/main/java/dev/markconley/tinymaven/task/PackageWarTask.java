@@ -5,26 +5,34 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Objects;
 import java.util.jar.Attributes;
 import java.util.jar.JarEntry;
 import java.util.jar.JarOutputStream;
 import java.util.jar.Manifest;
 
 import dev.markconley.tinymaven.config.ProjectConfig;
+import dev.markconley.tinymaven.exception.TinyMavenException;
 
 public class PackageWarTask implements Task {
+	
+    private final ProjectConfig config;
+
+    public PackageWarTask(ProjectConfig config) {
+        this.config = Objects.requireNonNull(config, "Project Configuration cannot be null");        
+    }
 
 	@Override
-	public void execute(ProjectConfig config) {
+	public void execute() throws TinyMavenException {
 		System.out.println("Packaging WAR...");
 		try {
-			createWarArchive(config);
+			createWarArchive();
 		} catch (IOException e) {
 			System.err.println("Failed to create WAR file: " + e.getMessage());
 		}
 	}
 
-	private void createWarArchive(ProjectConfig config) throws IOException {
+	private void createWarArchive() throws IOException {
 		String warName = config.getProject().getName() + ".war";
 		Path outputDirectory = Paths.get("build");
 		Path warPath = outputDirectory.resolve(warName);

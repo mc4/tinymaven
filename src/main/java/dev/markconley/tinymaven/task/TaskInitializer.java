@@ -3,16 +3,16 @@ package dev.markconley.tinymaven.task;
 import javax.tools.JavaCompiler;
 import javax.tools.ToolProvider;
 
-public class TaskInitializer {
+import dev.markconley.tinymaven.config.ProjectConfig;
 
-    public static void initialize(TaskManager taskManager) {
-        JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
-        taskManager.registerTask("clean", new CleanTask());
-        taskManager.registerTask("compile", new SourceCompileTask(compiler));
-        taskManager.registerTask("testcompile", new TestCompileTask(compiler));
-        taskManager.registerTask("test", new TestRunnerTask());
-        taskManager.registerTask("packagejar", new PackageJarTask());
-        taskManager.registerTask("packagewar", new PackageWarTask());
-        taskManager.registerTask("build", new BuildTask(taskManager));
-    }
+public class TaskInitializer {
+	public static void initialize(TaskManager taskManager, ProjectConfig config) {
+		JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
+		taskManager.registerTask("clean", new CleanTask(config));
+		taskManager.registerTask("sourceCompile", new SourceCompileTask(config, compiler));
+		taskManager.registerTask("testCompile", new TestCompileTask(config, compiler));
+		taskManager.registerTask("testRun", new TestRunnerTask(config));
+		taskManager.registerTask("packageJar", new PackageJarTask(config));
+		taskManager.registerTask("packageWar", new PackageWarTask(config));
+	}
 }
