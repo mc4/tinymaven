@@ -1,6 +1,5 @@
 package dev.markconley.tinymaven.task;
 
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -11,16 +10,17 @@ import java.util.jar.JarEntry;
 import java.util.jar.JarOutputStream;
 import java.util.jar.Manifest;
 
+import dev.markconley.tinymaven.config.ManifestAttributes;
 import dev.markconley.tinymaven.config.ProjectConfig;
 import dev.markconley.tinymaven.exception.TinyMavenException;
 
 public class PackageWarTask implements Task {
-	
-    private final ProjectConfig config;
 
-    public PackageWarTask(ProjectConfig config) {
-        this.config = Objects.requireNonNull(config, "Project Configuration cannot be null");        
-    }
+	private final ProjectConfig config;
+
+	public PackageWarTask(ProjectConfig config) {
+		this.config = Objects.requireNonNull(config, "Project Configuration cannot be null");
+	}
 
 	@Override
 	public void execute() throws TinyMavenException {
@@ -28,7 +28,7 @@ public class PackageWarTask implements Task {
 		try {
 			createWarArchive();
 		} catch (IOException e) {
-			System.err.println("Failed to create WAR file: " + e.getMessage());
+			throw new TinyMavenException("Failed to create WAR file", e);
 		}
 	}
 
@@ -37,29 +37,39 @@ public class PackageWarTask implements Task {
 		Path outputDirectory = Paths.get("build");
 		Path warPath = outputDirectory.resolve(warName);
 		Files.createDirectories(outputDirectory);
+		Manifest manifest = createManifest(config.getProject().getMainClass());
 
-		try (FileOutputStream fos = new FileOutputStream(warPath.toFile());
-				JarOutputStream jos = new JarOutputStream(fos, createManifest(config.getProject().getMainClass()))) {
-
-			// Add WEB-INF/classes
-			Path classesDirectory = Paths.get("build/classes");
-			if (Files.exists(classesDirectory)) {
-				addDirectoryToJar(jos, classesDirectory, "WEB-INF/classes/");
+		try (JarOutputStream jos = new JarOutputStream(Files.newOutputStream(warPath), manifest)) {
+			Path classesDir = Paths.get(config.getOutputDirectory()).toAbsolutePath().normalize();
+			if (Files.exists(classesDir)) {
+				addDirectoryToJar(jos, classesDir, "WEB-INF/classes/");
 			}
 
-			// TODO: add web resources (like index.html, etc.)
+			Path webResourcesDir = Paths.get("src/main/webapp").toAbsolutePath().normalize();
+			if (Files.exists(webResourcesDir)) {
+				addDirectoryToJar(jos, webResourcesDir, "");
+			}
+
+			System.out.println("WAR packaged successfully at: " + warPath);
 		}
 	}
 
 	private Manifest createManifest(String mainClass) {
 		Manifest manifest = new Manifest();
-		manifest.getMainAttributes().put(Attributes.Name.MANIFEST_VERSION, "1.0");
-		manifest.getMainAttributes().put(Attributes.Name.MAIN_CLASS, mainClass);
+		Attributes attrs = manifest.getMainAttributes();
+		attrs.put(Attributes.Name.MANIFEST_VERSION, "1.0");
+		attrs.put(Attributes.Name.MAIN_CLASS, mainClass);
+		attrs.put(new Attributes.Name(ManifestAttributes.CREATED_BY), "TinyMaven 1.0");
+		attrs.put(new Attributes.Name(ManifestAttributes.BUILT_BY), "Mark Conley");
+		attrs.put(new Attributes.Name(ManifestAttributes.IMPLEMENTATION_TITLE), "TinyMaven");
+		attrs.put(new Attributes.Name(ManifestAttributes.IMPLEMENTATION_VERSION), "1.0.0");
 		return manifest;
 	}
 
 	private void addDirectoryToJar(JarOutputStream jos, Path sourceDirectory, String prefix) throws IOException {
-		Files.walk(sourceDirectory).filter(Files::isRegularFile).forEach(path -> {
+		Files.walk(sourceDirectory)
+			.filter(Files::isRegularFile)
+			.forEach(path -> {
 			String entryName = prefix + sourceDirectory.relativize(path).toString().replace("\\", "/");
 			JarEntry entry = new JarEntry(entryName);
 			try {

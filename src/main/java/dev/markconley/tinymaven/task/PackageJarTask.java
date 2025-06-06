@@ -28,7 +28,7 @@ public class PackageJarTask implements Task {
 		packageJar();
 	}
 
-	private void packageJar() {
+	private void packageJar() throws TinyMavenException {
 	    System.out.println("Packaging JAR...");
 	    try {
 	        Path buildRoot = Paths.get(config.getOutputDirectory()).toAbsolutePath().normalize();
@@ -46,7 +46,7 @@ public class PackageJarTask implements Task {
 	        System.out.println("JAR packaged successfully at: " + jarPath);
 	    } catch (IOException e) {
 	        System.err.println("Failed to create JAR file: " + e.getMessage());
-	        e.printStackTrace();
+	        throw new TinyMavenException("Failed to create JAR file", e);
 	    }   
 	}
 
@@ -54,7 +54,7 @@ public class PackageJarTask implements Task {
 		Manifest manifest = new Manifest();
 		manifest.getMainAttributes().put(Attributes.Name.MANIFEST_VERSION, "1.0");
 		manifest.getMainAttributes().put(Attributes.Name.MAIN_CLASS, mainClass);
-		manifest.getMainAttributes().put(new Attributes.Name(ManifestAttributes.CREATED_BY), "TinyMaven 1.0 (Java 24)");
+		manifest.getMainAttributes().put(new Attributes.Name(ManifestAttributes.CREATED_BY), "TinyMaven 1.0");
 		manifest.getMainAttributes().put(new Attributes.Name(ManifestAttributes.BUILT_BY), "Mark Conley");
 		manifest.getMainAttributes().put(new Attributes.Name(ManifestAttributes.IMPLEMENTATION_TITLE), "TinyMaven");
 		manifest.getMainAttributes().put(new Attributes.Name(ManifestAttributes.IMPLEMENTATION_VERSION), "1.0.0");
