@@ -2,6 +2,7 @@ project:
   name: tinymaven
   version: 0.0.1
   mainClass: dev.markconley.tinymaven.TinyMaven
+  groupId: dev.markconley.tinymaven
   packaging: jar # or "war"
   
 dependencies:

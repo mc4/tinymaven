@@ -74,12 +74,12 @@ public class ProjectConfig {
 		this.lifecycle = lifecycle;
 	}
 
-
 	public static class Project {
 		private String name;
 		private String version;
 		private String mainClass;
 		private String packaging;
+		private String groupId;
 
 		public String getName() {
 			return name;
@@ -92,9 +92,13 @@ public class ProjectConfig {
 		public String getMainClass() {
 			return mainClass;
 		}
-		
+
 		public String getPackaging() {
 			return packaging != null ? packaging : "jar"; // default to jar
+		}
+
+		public String getGroupId() {
+			return groupId != null ? groupId : "default.group"; // add fallback if needed
 		}
 
 		public void setName(String name) {
@@ -107,6 +111,14 @@ public class ProjectConfig {
 
 		public void setMainClass(String mainClass) {
 			this.mainClass = mainClass;
+		}
+
+		public void setPackaging(String packaging) {
+			this.packaging = packaging;
+		}
+
+		public void setGroupId(String groupId) {
+			this.groupId = groupId;
 		}
 	}
 
