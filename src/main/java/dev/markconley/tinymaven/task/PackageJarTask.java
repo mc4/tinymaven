@@ -3,91 +3,52 @@ package dev.markconley.tinymaven.task;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
-import java.util.jar.Attributes;
 import java.util.jar.JarEntry;
 import java.util.jar.JarOutputStream;
 import java.util.jar.Manifest;
 import java.util.stream.Collectors;
 
-import dev.markconley.tinymaven.config.ManifestAttributes;
 import dev.markconley.tinymaven.config.ProjectConfig;
 import dev.markconley.tinymaven.exception.TinyMavenException;
 
-public class PackageJarTask implements Task {
+public class PackageJarTask extends AbstractPackagingTask {
 
-    private final ProjectConfig config;
+	public PackageJarTask(ProjectConfig config) {
+		super(config);
+	}
 
-    public PackageJarTask(ProjectConfig config) {
-        this.config = config;
-    }
-	
 	@Override
 	public void execute() throws TinyMavenException {
-		packageJar();
+		System.out.println("Packaging JAR...");
+		try {
+			Path outputDir = getJarOutputDir();
+			String jarFileName = config.getProject().getName() + ".jar";
+			Path jarPath = outputDir.resolve(jarFileName);
+
+			List<Path> classFiles = collectClassFiles(getBuildClassesDir());
+			Manifest manifest = createManifest();
+
+			try (JarOutputStream jos = new JarOutputStream(Files.newOutputStream(jarPath), manifest)) {
+				for (Path classFile : classFiles) {
+					String entryName = getBuildClassesDir().relativize(classFile).toString().replace("\\", "/");
+					JarEntry entry = new JarEntry(entryName);
+					jos.putNextEntry(entry);
+					Files.copy(classFile, jos);
+					jos.closeEntry();
+				}
+			}
+
+			System.out.println("JAR packaged successfully at: " + jarPath);
+		} catch (IOException e) {
+			throw new TinyMavenException("Failed to package JAR", e);
+		}
 	}
 
-	private void packageJar() throws TinyMavenException {
-	    System.out.println("Packaging JAR...");
-	    try {
-	        Path buildRoot = Paths.get(config.getOutputDirectory()).toAbsolutePath().normalize();
-	        Path jarOutputDir = Paths.get("build/libs").toAbsolutePath().normalize();
-	        Files.createDirectories(jarOutputDir);
-
-	        String jarFileName = config.getProject().getName() + ".jar";
-	        Path jarPath = jarOutputDir.resolve(jarFileName);
-
-	        List<Path> classFiles = collectClassFiles(buildRoot.toString());
-	        Manifest manifest = createManifest(config.getProject().getMainClass());
-
-	        buildJar(jarPath, classFiles, manifest, buildRoot);
-
-	        System.out.println("JAR packaged successfully at: " + jarPath);
-	    } catch (IOException e) {
-	        System.err.println("Failed to create JAR file: " + e.getMessage());
-	        throw new TinyMavenException("Failed to create JAR file", e);
-	    }   
-	}
-
-	private Manifest createManifest(String mainClass) {
-		Manifest manifest = new Manifest();
-		manifest.getMainAttributes().put(Attributes.Name.MANIFEST_VERSION, "1.0");
-		manifest.getMainAttributes().put(Attributes.Name.MAIN_CLASS, mainClass);
-		manifest.getMainAttributes().put(new Attributes.Name(ManifestAttributes.CREATED_BY), "TinyMaven 1.0");
-		manifest.getMainAttributes().put(new Attributes.Name(ManifestAttributes.BUILT_BY), "Mark Conley");
-		manifest.getMainAttributes().put(new Attributes.Name(ManifestAttributes.IMPLEMENTATION_TITLE), "TinyMaven");
-		manifest.getMainAttributes().put(new Attributes.Name(ManifestAttributes.IMPLEMENTATION_VERSION), "1.0.0");
-		return manifest;
-	}
-
-	private List<Path> collectClassFiles(String sourceDirectory) throws IOException {
-		return Files.walk(Path.of(sourceDirectory))
-				.filter(path -> Files.isRegularFile(path) && path.toString().endsWith(".class"))
+	private List<Path> collectClassFiles(Path baseDir) throws IOException {
+		return Files.walk(baseDir)
+				.filter(p -> Files.isRegularFile(p) && p.toString().endsWith(".class"))
 				.collect(Collectors.toList());
-	}
-
-	private void buildJar(Path jarPath, List<Path> classFiles, Manifest manifest, Path buildRoot)
-	        throws IOException {
-
-	    try (JarOutputStream jos = new JarOutputStream(Files.newOutputStream(jarPath), manifest)) {
-	        for (Path classFile : classFiles) {
-	            Path normalizedClassFile = classFile.toAbsolutePath().normalize();
-
-	            if (!normalizedClassFile.startsWith(buildRoot)) {
-	                System.err.println("Skipping file outside build root: " + classFile);
-	                continue;
-	            }
-
-	            String entryName = buildRoot.relativize(normalizedClassFile).toString().replace("\\", "/");
-	            System.out.println("Adding to JAR: " + entryName);
-
-	            JarEntry entry = new JarEntry(entryName);
-	            jos.putNextEntry(entry);
-	            Files.copy(normalizedClassFile, jos);
-	            jos.closeEntry();
-	        }
-	    }
 	}
 
 }
