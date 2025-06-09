@@ -150,5 +150,8 @@ public class ProjectConfig {
 		public void setVersion(String version) {
 			this.version = version;
 		}
+
+		
 	}
+	
 }

@@ -5,12 +5,14 @@ import java.util.Arrays;
 import dev.markconley.tinymaven.config.BuildLifeCycle;
 import dev.markconley.tinymaven.config.ConfigLoader;
 import dev.markconley.tinymaven.config.ProjectConfig;
-import dev.markconley.tinymaven.exception.ConfigurationException;
 import dev.markconley.tinymaven.exception.DependencyResolutionException;
 import dev.markconley.tinymaven.exception.TaskExecutionException;
 import dev.markconley.tinymaven.exception.TinyMavenException;
 import dev.markconley.tinymaven.task.TaskInitializer;
 import dev.markconley.tinymaven.task.TaskManager;
+import dev.markconley.tinymaven.validation.ProjectConfigValidators;
+import dev.markconley.tinymaven.validation.ValidationResult;
+import dev.markconley.tinymaven.validation.Validator;
 
 public class TinyMaven {
 
@@ -24,12 +26,18 @@ public class TinyMaven {
 			}
 
 			ProjectConfig config = ConfigLoader.loadConfig("build.yaml");
+			Validator<ProjectConfig> validator = ProjectConfigValidators.projectConfigValidator();
+			ValidationResult validationResult = validator.validate(config);
 
-			try {
-				config = ConfigLoader.loadConfig("build.yaml");
-			} catch (ConfigurationException e) {
-				System.err.println("Failed to load project configuration: " + e.getMessage());
-				System.exit(1);
+			if (validationResult.hasErrors()) {
+			    System.err.println("Config validation failed:");
+			    System.err.println(validationResult);
+			    System.exit(1);
+			}
+
+			if (validationResult.hasWarnings()) {
+			    System.out.println("Config validation warnings:");
+			    System.out.println(validationResult);
 			}
 
 			TaskManager taskManager = new TaskManager(config);
